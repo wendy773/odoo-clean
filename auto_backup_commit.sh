@@ -19,8 +19,13 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# ===== CLEAN OLD BACKUPS (> 7 days) =====
+echo "[INFO] Cleaning old backups..."
+find $BACKUP_DIR -type f -name "*.sql" -mtime +7 -delete
+
 # ===== GIT COMMIT AND PUSH =====
 echo "[INFO] Committing changes to Git..."
+git status --short
 git add .
 git commit -m "Auto commit and DB backup at $DATE"
 git push origin main
