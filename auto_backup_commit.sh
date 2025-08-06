@@ -1,34 +1,23 @@
 #!/bin/bash
 
-# ===== CONFIGURATION =====
-DB_NAME="laboyglass"
-DB_USER="laboyglassau"
-BACKUP_DIR="db_backup"
-DATE=$(date +"%Y-%m-%d_%H-%M")
-BACKUP_FILE="$BACKUP_DIR/odoo_${DATE}.sql"
+# 自动备份和提交脚本（适用于 Docker 部署）
 
-# ===== CREATE BACKUP DIRECTORY IF NEEDED =====
-mkdir -p $BACKUP_DIR
+echo "[INFO] Backing up database..."
 
-# ===== PERFORM DATABASE BACKUP =====
-#echo "[INFO] Backing up database..."
-#sudo -u postgres pg_dump $DB_NAME > $BACKUP_FILE
+mkdir -p db_backup
+docker exec odoo-db pg_dump -U odoo laboyglass > db_backup/odoo_2025-08-06_15-05.sql
 
-#if [ $? -ne 0 ]; then
- #   echo "[ERROR] Database backup failed. Aborting."
-  #  exit 1
-#fi
+if [ $? -ne 0 ]; then
+    echo "[ERROR] Database backup failed. Aborting."
+    exit 1
+fi
 
-# ===== CLEAN OLD BACKUPS (> 7 days) =====
-echo "[INFO] Cleaning old backups..."
-find $BACKUP_DIR -type f -name "*.sql" -mtime +7 -delete
+echo "[INFO] Cleaning old backups (keep 5)..."
+ls -tp db_backup/*.sql | grep -v '/$' | tail -n +6 | xargs -I {} rm -- {} 2>/dev/null
 
-# ===== GIT COMMIT AND PUSH =====
 echo "[INFO] Committing changes to Git..."
-git status --short
 git add .
-git commit -m "Auto commit and DB backup at $DATE"
+git commit -m "Auto commit and DB backup at 2025-08-06_15-05"
 git push origin main
 
-# ===== DONE =====
 echo "[INFO] Backup and commit completed."
