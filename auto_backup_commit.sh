@@ -11,13 +11,13 @@ BACKUP_FILE="$BACKUP_DIR/odoo_${DATE}.sql"
 mkdir -p $BACKUP_DIR
 
 # ===== PERFORM DATABASE BACKUP =====
-echo "[INFO] Backing up database..."
-sudo -u postgres pg_dump $DB_NAME > $BACKUP_FILE
+#echo "[INFO] Backing up database..."
+#sudo -u postgres pg_dump $DB_NAME > $BACKUP_FILE
 
-if [ $? -ne 0 ]; then
-    echo "[ERROR] Database backup failed. Aborting."
-    exit 1
-fi
+#if [ $? -ne 0 ]; then
+ #   echo "[ERROR] Database backup failed. Aborting."
+  #  exit 1
+#fi
 
 # ===== CLEAN OLD BACKUPS (> 7 days) =====
 echo "[INFO] Cleaning old backups..."
